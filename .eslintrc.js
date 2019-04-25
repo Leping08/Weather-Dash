@@ -15,7 +15,7 @@ module.exports = {
     'prettier/vue'
   ],
   plugins: [
-    'prettier'
+	'prettier'
   ],
   // add your custom rules here
   rules: {
