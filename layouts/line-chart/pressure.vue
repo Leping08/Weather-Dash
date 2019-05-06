@@ -112,6 +112,7 @@ export default {
 				x: Date.parse(data.pressure.measurement_time),
 				y: data.pressure.millibars
 			})
+			this.series[0].data.shift()
 		},
 		connect() {
 			if (!this.echo) {

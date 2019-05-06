@@ -113,6 +113,7 @@ export default {
 				x: Date.parse(data.temperature.measurement_time),
 				y: data.temperature.degrees
 			})
+			this.series[0].data.shift()
 		},
 		connect() {
 			if (!this.echo) {
