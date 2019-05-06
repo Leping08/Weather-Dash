@@ -1,6 +1,6 @@
 # Weather-Dash
 
-> My lovely Nuxt.js project
+![Test Image 4](https://raw.githubusercontent.com/Leping08/Weather-Dash/master/static/dashboard.png)
 
 ## Build Setup
 
