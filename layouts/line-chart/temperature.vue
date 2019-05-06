@@ -1,6 +1,8 @@
 <template>
 	<div class="">
-		<h1>Temperature</h1>
+		<div class="text-grey text-xl text-center">
+			<span class="pr-2"><thermometer /></span>Temperature
+		</div>
 		<no-ssr>
 			<apex-chart
 				ref="realtimeChart"
@@ -14,9 +16,15 @@
 </template>
 
 <script>
+import Echo from 'laravel-echo'
+import thermometer from 'vue-material-design-icons/Thermometer.vue'
 export default {
+	components: {
+		thermometer
+	},
 	data() {
 		return {
+			echo: null,
 			series: [
 				{
 					name: '° F',
@@ -25,25 +33,35 @@ export default {
 				}
 			],
 			chartOptions: {
-				grid: {
-					row: {
-						colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-						opacity: 0.5
-					}
-				},
 				toolbar: {
 					autoSelected: 'zoom'
 				},
+				grid: {
+					yaxis: {
+						lines: {
+							show: false
+						}
+					}
+				},
+				colors: ['#3490DC'],
 				zoom: {
 					type: 'x',
 					enabled: true
 				},
 				stroke: {
-					curve: 'smooth'
+					show: true,
+					curve: 'smooth',
+					width: 2
 				},
 				fill: {
-					type: 'solid',
-					opacity: [0.2, 1]
+					type: 'gradient',
+					gradient: {
+						type: 'vertical',
+						opacityFrom: 0.8,
+						opacityTo: 0.01,
+						stops: [0, 100],
+						colorStops: []
+					}
 				},
 				xaxis: {
 					type: 'datetime',
@@ -53,15 +71,19 @@ export default {
 							month: "MMM 'yy",
 							day: 'dd MMM',
 							hour: 'HH:mm:ss'
+						},
+						style: {
+							colors: 'gray'
 						}
 					}
 				},
 				yaxis: {
-					max: 100,
-					min: 32,
-					title: {
-						text: 'Degrees Fahrenheit'
-					}
+					labels: {
+						style: {
+							color: 'gray'
+						}
+					},
+					forceNiceScale: true
 				}
 			},
 			initalData: null
@@ -75,6 +97,7 @@ export default {
 	},
 	mounted() {
 		this.fetchData()
+		this.connect()
 	},
 	methods: {
 		async fetchData() {
@@ -84,6 +107,27 @@ export default {
 			this.series[0].data = this.initalData.map(function(data) {
 				return { x: Date.parse(data.measurement_time), y: data.degrees }
 			})
+		},
+		updateChart(data) {
+			this.series[0].data.push({
+				x: Date.parse(data.temperature.measurement_time),
+				y: data.temperature.degrees
+			})
+		},
+		connect() {
+			if (!this.echo) {
+				this.echo = new Echo({
+					broadcaster: 'pusher',
+					key: 'OoE1bixAvTPlI75uNqR5',
+					cluster: 'mt1',
+					encrypted: false,
+					wsHost: '127.0.0.1',
+					wsPort: '6001'
+				})
+				this.echo.channel('weather').listen('WeatherMeasured', message => {
+					this.updateChart(message)
+				})
+			}
 		}
 	}
 }

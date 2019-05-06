@@ -24,12 +24,15 @@ module.exports = {
 	/*
 	 ** Global CSS
 	 */
-	css: ['~/assets/css/tailwind.css'],
+	css: ['~/assets/css/tailwind.css', 'vue-material-design-icons/styles.css'],
 
 	/*
 	 ** Plugins to load before mounting the App
 	 */
-	plugins: [{ src: '~/plugins/apexcharts.js', ssr: false }],
+	plugins: [
+		{ src: '~/plugins/apexcharts.js', ssr: false },
+		{ src: '~/plugins/pusher.js', ssr: false }
+	],
 
 	/*
 	 ** Nuxt.js modules

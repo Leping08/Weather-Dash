@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import Echo from 'laravel-echo'
 export default {
 	data() {
 		return {
@@ -34,6 +35,7 @@ export default {
 				toolbar: {
 					autoSelected: 'zoom'
 				},
+				colors: ['#6574CD'],
 				zoom: {
 					type: 'x',
 					enabled: true
@@ -75,6 +77,7 @@ export default {
 	},
 	mounted() {
 		this.fetchData()
+		this.connect()
 	},
 	methods: {
 		async fetchData() {
@@ -84,6 +87,27 @@ export default {
 			this.series[0].data = this.initalData.map(function(data) {
 				return { x: Date.parse(data.measurement_time), y: data.percentage }
 			})
+		},
+		updateChart(data) {
+			this.series[0].data.push({
+				x: Date.parse(data.humidity.measurement_time),
+				y: data.humidity.percentage
+			})
+		},
+		connect() {
+			if (!this.echo) {
+				this.echo = new Echo({
+					broadcaster: 'pusher',
+					key: 'OoE1bixAvTPlI75uNqR5',
+					cluster: 'mt1',
+					encrypted: false,
+					wsHost: '127.0.0.1',
+					wsPort: '6001'
+				})
+				this.echo.channel('weather').listen('WeatherMeasured', message => {
+					this.updateChart(message)
+				})
+			}
 		}
 	}
 }
